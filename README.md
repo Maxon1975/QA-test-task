@@ -1,127 +1,189 @@
-# QA-test-task
-Тестовое задание на вакансию тестировщика (QA)
+# ✅ Тестовое задание — QA (Тестировщик)
 
-### Решение тестового задания для вакансии тестировщика (QA)
-Я создал набор end-to-end тестов с использованием Playwright на TypeScript. Тесты покрывают все требования из задания.
-### Особенности реализации:
-1. Использован Page Object Model (POM) для улучшения поддержки кода
-2. Добавлены хелпер-функции для повторного использования кода
-3. Реализованы проверки:
-   - Сообщения об ошибках авторизации
-   - Наличия элементов на странице
-   - Соответствия URL
-   - Сравнения данных пользователя
-4. Тесты изолированы и могут запускаться независимо
-5. Добавлена поддержка разных браузеров
-Тесты покрывают все требования задания и могут быть легко расширены для покрытия дополнительных сценариев.
-#### Структура проекта:
-![image](https://github.com/user-attachments/assets/09fef0e9-6b86-41e1-82e4-2afd60ce19a7)
+## 📌 Задача:
+Написать E2E-тесты для системы дистанционного обучения:  
+🔗 [https://dev2.getinfo.radugi.net](https://dev2.getinfo.radugi.net.radugi.net)  
+🔐 Логин: `dumbledore@sct.team`  
+🔓 Пароль: `12345678qQ1`
 
-### Код тестов:
+---
 
-#### 1. Тесты авторизации и восстановления пароля (tests/auth.spec.ts):
+## 🔧 Используемые инструменты:
 
-import { test, expect } from '@playwright/test';
-import { BASE_URL } from './utils/helpers';
+- **Фреймворк**: [Cypress](https://www.cypress.io/)
+- **Язык**: JavaScript
+- **Дополнительно**: Mocha + Chai
 
-test.describe('Авторизация и восстановление пароля', () => {
-  test('Ошибка при неверных учетных данных', async ({ page }) => {
-    await page.goto(BASE_URL);
-    
-    // Заполнение неверными данными
-    await page.fill('input[name="username"]', 'invalid@user.com');
-    await page.fill('input[name="password"]', 'wrong_password');
-    await page.click('button[type="submit"]');
-    
-    // Проверка сообщения об ошибке
-    await expect(page.locator('.error-message'))
-      .toHaveText('Неверный логин или пароль');
-  });
+---
 
-  test('Успешная авторизация', async ({ page }) => {
-    await page.goto(BASE_URL);
-    
-    // Заполнение верными данными
-    await page.fill('input[name="username"]', 'dumbledore@sct.team');
-    await page.fill('input[name="password"]', '12345678qQ1');
-    await page.click('button[type="submit"]');
-    
-    // Проверка перехода после авторизации
-    await expect(page).toHaveURL(`${BASE_URL}/dashboard`);
-    await expect(page.locator('.user-profile')).toBeVisible();
-  });
+## 📁 Структура проекта:
 
-  test('Наличие ссылки восстановления пароля', async ({ page }) => {
-    await page.goto(BASE_URL);
-    
-    // Проверка наличия ссылки
-    const recoveryLink = page.locator('a:has-text("Забыли пароль?")');
-    await expect(recoveryLink).toBeVisible();
-    await expect(recoveryLink).toHaveAttribute('href', '/password-recovery');
-  });
+```
+cypress/
+├── e2e/
+│   ├── login.cy.js
+│   ├── forgot_password.cy.js
+│   ├── company_page.cy.js
+│   └── user_profile.cy.js
+├── support/
+│   └── commands.js
+└── cypress.config.js
+```
+
+---
+
+## 1. ✅ Форма авторизации
+
+### Тест-кейсы:
+1. Успешный вход с корректными учетными данными
+2. Ошибка при неверном логине или пароле
+3. Проверка, что после успешного входа пользователь перенаправляется на главную страницу
+
+```javascript
+// cypress/e2e/login.cy.js
+describe('Авторизация', () => {
+    it('Успешный вход', () => {
+        cy.visit('/login');
+        cy.get('#email').type('dumbledore@sct.team');
+        cy.get('#password').type('12345678qQ1');
+        cy.get('form').submit();
+        cy.url().should('include', '/dashboard'); // проверка редиректа
+    });
+
+    it('Ошибка при неверном логине/пароле', () => {
+        cy.visit('/login');
+        cy.get('#email').type('wrong@example.com');
+        cy.get('#password').type('wrongpass');
+        cy.get('form').submit();
+        cy.contains('Неверный логин или пароль').should('be.visible');
+    });
 });
+```
 
-#### 2. Тесты страницы компании (tests/company.spec.ts):
-import { test, expect } from '@playwright/test';
-import { BASE_URL, login } from './utils/helpers';
+---
 
-test.describe('Страница компании', () => {
-  test.beforeEach(async ({ page }) => {
-    await login(page);
-  });
+## 2. ✅ Форма восстановления пароля
 
-  test('Доступность страницы компании', async ({ page }) => {
-    await page.goto(`${BASE_URL}/company`);
-    
-    // Проверка заголовка и содержимого
-    await expect(page).toHaveURL(`${BASE_URL}/company`);
-    await expect(page.locator('h1:has-text("Информация о компании")'))
-      .toBeVisible();
-  });
+### Тест-кейсы:
+1. Наличие ссылки "Забыли пароль?"
+2. Открытие формы восстановления
+3. Проверка отправки письма с инструкциями
 
-  test('Совпадение пользователя и руководителя', async ({ page }) => {
-    await page.goto(`${BASE_URL}/company`);
-    
-    // Получение данных пользователя
-    const currentUser = 'dumbledore@sct.team';
-    
-    // Проверка данных руководителя
-    const leaderEmail = await page.locator('.leader-info .email')
-      .textContent();
-    
-    expect(leaderEmail?.trim()).toBe(currentUser);
-  });
+```javascript
+// cypress/e2e/forgot_password.cy.js
+describe('Восстановление пароля', () => {
+    it('Проверка наличия ссылки и открытия формы', () => {
+        cy.visit('/login');
+        cy.contains('Забыли пароль?').click();
+        cy.contains('Восстановление пароля').should('be.visible');
+    });
+
+    it('Отправка запроса на восстановление', () => {
+        cy.visit('/forgot-password');
+        cy.get('#email').type('dumbledore@sct.team');
+        cy.get('form').submit();
+        cy.contains('Инструкции отправлены на email').should('be.visible');
+    });
 });
+```
+
+---
+
+## 3. ✅ Доступность страницы "Компания" после авторизации
+
+```javascript
+// cypress/e2e/company_page.cy.js
+describe('Страница Компания', () => {
+    beforeEach(() => {
+        cy.login('dumbledore@sct.team', '12345678qQ1');
+    });
+
+    it('Доступ к странице Компания', () => {
+        cy.visit('/company');
+        cy.contains('О компании').should('be.visible');
+    });
+});
+```
+
+> Примечание: реализация `cy.login()` описана ниже.
+
+---
+
+## 4. ✅ Совпадает ли текущий пользователь с указанным руководителем
+
+```javascript
+// cypress/e2e/user_profile.cy.js
+describe('Проверка профиля пользователя', () => {
+    beforeEach(() => {
+        cy.login('dumbledore@sct.team', '12345678qQ1');
+    });
+
+    it('Пользователь указан как руководитель компании', () => {
+        cy.visit('/company');
+        cy.contains('Руководитель: Dumbledore').should('be.visible');
+    });
+});
+```
+
+---
+
+## 🛠 Поддержка: добавляем команду входа
+
+```javascript
+// cypress/support/commands.js
+Cypress.Commands.add('login', (email, password) => {
+    cy.visit('/login');
+    cy.get('#email').type(email);
+    cy.get('#password').type(password);
+    cy.get('form').submit();
+    cy.url().should('include', '/dashboard');
+});
+```
+
+---
+
+## 📦 Инструкция по запуску
+
+1. Установите Cypress:
+```bash
+npm init -y
+npm install cypress --save-dev
+```
+
+2. Замените содержимое файла `cypress.config.js` следующим:
+
+```js
+const { defineConfig } = require('cypress');
+
+module.exports = defineConfig({
+  e2e: {
+    baseUrl: 'https://dev2.getinfo.radugi.net',
+    setupNodeEvents(on, config) {
+      return config;
+    },
+  },
+});
+```
+
+3. Вставьте ваши тестовые файлы в папку `cypress/e2e/`.
+
+4. Запустите Cypress:
+```bash
+npx cypress open
+```
+
+или выполните все тесты в headless режиме:
+```bash
+npx cypress run
+```
+
+---
+
+## 📁 Как отправить результат?
 
 
-#### 3. Вспомогательные функции (tests/utils/helpers.ts):
-export const BASE_URL = 'https://dev2.getinfo.radugi.net';
+---
 
-export async function login(page) {
-  await page.goto(BASE_URL);
-  await page.fill('input[name="username"]', 'dumbledore@sct.team');
-  await page.fill('input[name="password"]', '12345678qQ1');
-  await page.click('button[type="submit"]');
-  await page.waitForURL(`${BASE_URL}/dashboard`);
-}
-### Инструкция по запуску
-
-# Все тесты
-npx playwright test
-
-# Тесты авторизации
-npx playwright test tests/auth.spec.ts
-
-# Тесты страницы компании
-npx playwright test tests/company.spec.ts
-
-## Просмотр отчетов:
-npx playwright show-report
-
-## Настройки в playwright.config.ts:
-- По умолчанию тесты запускаются в headless режиме
-- Для отладки можно добавить параметр --headed
-- Поддерживаются браузеры: Chromium, Firefox, WebKit
 
 
 
