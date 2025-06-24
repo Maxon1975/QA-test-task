@@ -20,6 +20,7 @@
 ### Код тестов:
 
 #### 1. Тесты авторизации и восстановления пароля (tests/auth.spec.ts):
+
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from './utils/helpers';
 
@@ -59,7 +60,8 @@ test.describe('Авторизация и восстановление парол
     await expect(recoveryLink).toHaveAttribute('href', '/password-recovery');
   });
 });
-#### 2. Тесты страницы компании (tests/company.spec.ts):
+
+t#### 2. Тесты страницы компании (tests/company.spec.ts):
 import { test, expect } from '@playwright/test';
 import { BASE_URL, login } from './utils/helpers';
 
@@ -90,6 +92,8 @@ test.describe('Страница компании', () => {
     expect(leaderEmail?.trim()).toBe(currentUser);
   });
 });
+
+
 #### 3. Вспомогательные функции (tests/utils/helpers.ts):
 export const BASE_URL = 'https://dev2.getinfo.radugi.net';
 
@@ -101,6 +105,7 @@ export async function login(page) {
   await page.waitForURL(`${BASE_URL}/dashboard`);
 }
 ### Инструкция по запуску
+
 # Все тесты
 npx playwright test
 
@@ -109,8 +114,10 @@ npx playwright test tests/auth.spec.ts
 
 # Тесты страницы компании
 npx playwright test tests/company.spec.ts
+
 ## Просмотр отчетов:
 npx playwright show-report
+
 ## Настройки в playwright.config.ts:
 - По умолчанию тесты запускаются в headless режиме
 - Для отладки можно добавить параметр --headed
