@@ -61,7 +61,7 @@ test.describe('Авторизация и восстановление парол
   });
 });
 
-t#### 2. Тесты страницы компании (tests/company.spec.ts):
+#### 2. Тесты страницы компании (tests/company.spec.ts):
 import { test, expect } from '@playwright/test';
 import { BASE_URL, login } from './utils/helpers';
 
