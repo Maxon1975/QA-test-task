@@ -122,7 +122,7 @@ npx playwright show-report
 - По умолчанию тесты запускаются в headless режиме
 - Для отладки можно добавить параметр --headed
 - Поддерживаются браузеры: Chromium, Firefox, WebKit
-```
+
 
 
 
