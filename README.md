@@ -17,13 +17,13 @@
 #### Структура проекта:
 qa-test-task/
 ├── tests/
-│   ├── auth.spec.ts        # Тесты авторизации и восстановления пароля
-│   ├── company.spec.ts     # Тесты страницы компании
-│   └── utils/
-│       └── helpers.ts      # Вспомогательные функции
-├── playwright.config.ts    # Конфигурация Playwright
-├── package.json
-├── README.md               # Инструкция по запуску
+│ ├── auth.spec.ts # Тесты авторизации и восстановления пароля
+│ ├── company.spec.ts # Тесты страницы компании
+│ └── utils/
+│ └── helpers.ts # Вспомогательные функции
+├── playwright.config.ts # Конфигурация Playwright
+├── package.json # Зависимости и скрипты
+├── README.md # Инструкция по запуску
 └── .gitignore
 ### Код тестов:
 
